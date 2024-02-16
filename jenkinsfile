@@ -5,7 +5,10 @@ pipeline {
         stage('git clone') {
             steps {
                 script {
-                    sh "git clone https://github.com/sumitchavan0110/automation-online-job-management-system-python-django-feb.git"
+                    // Clone the repository into the specified directory
+                    dir('automation-online-job-management-system-python-django-feb') {
+                        git 'https://github.com/sumitchavan0110/automation-online-job-management-system-python-django-feb.git'
+                    }
                 }
             }
         }
@@ -13,12 +16,14 @@ pipeline {
         stage('docker build') {
             steps {
                 script {
-                    sh '''
-                        cd automation-online-job-management-system-python-django-feb
-                        docker build -t sumitchavan0110/newjobportalimage .
-                    '''
-                    if (sh 'echo $?') {
-                        error 'Docker build failed'
+                    // Navigate to the cloned directory for Docker build
+                    dir('automation-online-job-management-system-python-django-feb') {
+                        // Build the Docker image with the appropriate tag
+                        sh 'docker build -t sumitchavan0110/newjobportalimage .'
+                        // Check the exit status of the Docker build
+                        if (sh 'echo $?') {
+                            error 'Docker build failed'
+                        }
                     }
                 }
             }
@@ -30,7 +35,7 @@ pipeline {
                     // Log in to Docker Hub using Jenkins credentials
                     withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
-                        // Push the Docker images to your Docker Hub repository
+                        // Push the Docker image to your Docker Hub repository
                         sh 'docker push sumitchavan0110/newjobportalimage'
                     }
                 }
@@ -39,6 +44,7 @@ pipeline {
 
         stage('Start Minikube') {
             steps {
+                // Start Minikube with the appropriate command
                 sh '/usr/local/bin/minikube start'
                 // Add any necessary validation or error handling
             }
@@ -46,26 +52,25 @@ pipeline {
 
         stage('Kubectl deployment') {
             steps {
-                sh '''
-                    cd automation-online-job-management-system-python-django-feb
-                    /usr/local/bin/kubectl apply -f deployment.yml
-                '''
-                // Add any necessary validation or error handling
+                script {
+                    // Apply deployment YAML using kubectl
+                    sh '/usr/local/bin/kubectl apply -f automation-online-job-management-system-python-django-feb/deployment.yml'
+                }
             }
         }
 
         stage('Kubectl service') {
             steps {
-                sh '''
-                    cd automation-online-job-management-system-python-django-feb
-                    /usr/local/bin/kubectl apply -f service.yml
-                '''
-                // Add any necessary validation or error handling
+                script {
+                    // Apply service YAML using kubectl
+                    sh '/usr/local/bin/kubectl apply -f automation-online-job-management-system-python-django-feb/service.yml'
+                }
             }
         }
 
         stage('List Minikube Services') {
             steps {
+                // List all Minikube services
                 sh '/usr/local/bin/minikube service --all'
                 // Add any necessary validation or error handling
             }
