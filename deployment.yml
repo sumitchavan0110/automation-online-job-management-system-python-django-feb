@@ -16,5 +16,6 @@ spec:
       containers:
         - name: jobportal-container
           image: sumitchavan0110/newjobportalimage:latest
+t
           ports:
             - containerPort: 8000
