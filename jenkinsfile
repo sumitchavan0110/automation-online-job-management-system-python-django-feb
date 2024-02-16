@@ -17,6 +17,9 @@ pipeline {
                         cd Jobportalfeb
                         docker build -t sumitchavan0110/newjobportalimage .
                     '''
+                    if (sh 'echo $?') {
+                        error 'Docker build failed'
+                    }
                 }
             }
         }
@@ -28,42 +31,43 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
                         // Push the Docker images to your Docker Hub repository
-                        sh 'docker push sumitchavan0110/newjobportalimage .'
+                        sh 'docker push sumitchavan0110/newjobportalimage'
                     }
                 }
             }
         }
+
         stage('Start Minikube') {
             steps {
                 sh '/usr/local/bin/minikube start'
-                
+                // Add any necessary validation or error handling
             }
         }
 
         stage('Kubectl deployment') {
             steps {
-                 sh '''
-                        cd Jobportalfeb
-                        /usr/local/bin/kubectl apply -f deployment.yml
-                    '''
-                
+                sh '''
+                    cd Jobportalfeb
+                    /usr/local/bin/kubectl apply -f deployment.yml
+                '''
+                // Add any necessary validation or error handling
             }
         }
 
         stage('Kubectl service') {
             steps {
                 sh '''
-                        cd Jobportalfeb
-                        /usr/local/bin/kubectl apply -f service.yml
-                    '''
+                    cd Jobportalfeb
+                    /usr/local/bin/kubectl apply -f service.yml
+                '''
+                // Add any necessary validation or error handling
             }
         }
-
-        
 
         stage('List Minikube Services') {
             steps {
                 sh '/usr/local/bin/minikube service --all'
+                // Add any necessary validation or error handling
             }
         }
     }
