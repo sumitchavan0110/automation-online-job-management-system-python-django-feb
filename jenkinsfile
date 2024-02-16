@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        cd Jobportalfeb
+                        cd automation-online-job-management-system-python-django-feb
                         docker build -t sumitchavan0110/newjobportalimage .
                     '''
                     if (sh 'echo $?') {
@@ -47,7 +47,7 @@ pipeline {
         stage('Kubectl deployment') {
             steps {
                 sh '''
-                    cd Jobportalfeb
+                    cd automation-online-job-management-system-python-django-feb
                     /usr/local/bin/kubectl apply -f deployment.yml
                 '''
                 // Add any necessary validation or error handling
@@ -57,7 +57,7 @@ pipeline {
         stage('Kubectl service') {
             steps {
                 sh '''
-                    cd Jobportalfeb
+                    cd automation-online-job-management-system-python-django-feb
                     /usr/local/bin/kubectl apply -f service.yml
                 '''
                 // Add any necessary validation or error handling
