@@ -28,7 +28,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-cred', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
                         // Push the Docker images to your Docker Hub repository
-                        sh 'docker push sumitchavan0110/newjobportalimage latest'
+                        sh 'docker push sumitchavan0110/newjobportalimage:latest'
                     }
                 }
             }
